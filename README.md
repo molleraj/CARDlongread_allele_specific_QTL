@@ -15,7 +15,84 @@ Usage: ./long_read_QTL_initial_variant_filtering.sh -i input_prefix -s sample_ex
 	-p Independent pairwise LD pruning settings (default "1000 50 0.3"). Numbers indicate window, step size, and r2 value for indep-pairwise pruning.
 ```
 ## Input data standardization
-Input data for the QTL pipeline must be standardized in the formats listed in the [CARDlongread_data_standardization](https://github.com/NIH-CARD/CARDlongread_data_standardization) repository using the included scripts. 
+Input data for the QTL pipeline must be standardized in the formats listed in the [CARDlongread_data_standardization](https://github.com/NIH-CARD/CARDlongread_data_standardization) repository using the included scripts. Filtered variants from the step above should be used as genetic variant input to generate respective maps and data matrices.
 ## Running the allele-specific QTL
+```
+usage: long_read_QTLs.py [-h] --chromosome CHROMOSOME --roi_map ROI_MAP --genetic_data GENETIC_DATA --methylation_data METHYLATION_DATA --genetic_map GENETIC_MAP --methylation_map METHYLATION_MAP --metadata METADATA --output OUTPUT
+                         [--window_size WINDOW_SIZE]
+
+Perform QTL analysis with user-specified parameters. Input data formats described in CARDlongread_data_standardization repository.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --chromosome CHROMOSOME
+                        Specify the chromosome to subset the ROI map (e.g., 'chr1').
+  --roi_map ROI_MAP     Path to the ROI map file.
+  --genetic_data GENETIC_DATA
+                        Path to the genetic data file (e.g., '/path/to/genetic_data').
+  --methylation_data METHYLATION_DATA
+                        Path to the methylation data file.
+  --genetic_map GENETIC_MAP
+                        Path to the genetic map file.
+  --methylation_map METHYLATION_MAP
+                        Path to the methylation map file.
+  --metadata METADATA   Path to the metadata file.
+  --output OUTPUT       Output file destination for results.
+  --window_size WINDOW_SIZE
+                        Window size for defining gene regions (default: 500000).
+```
 ## Postprocessing and data visualization
+```
+usage: long_read_QTL_lambda.py [-h] --input INPUT
+
+Perform lambda (genomic inflation factor) calculation for QTL results.
+
+optional arguments:
+  -h, --help     show this help message and exit
+  --input INPUT  Path to input QTL file for all chromosomes; 'gene,window_size,outcome,predictor,beta,std_err,r2,p_value,N,predictor_freq' as header.
+```
+```
+usage: long_read_QTL_fdr_correction.py [-h] --input INPUT --output OUTPUT [--rejected | --no-rejected] [--drop_na | --no-drop_na] [--top_hit_per_gene | --no-top_hit_per_gene] [--top_hit_per_region | --no-top_hit_per_region]
+                                       [--unique_hits | --no-unique_hits]
+
+Perform multiple hypothesis testing false-discovery rate (FDR) correction for allele-specific methylation QTL output from all chromosomes.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --input INPUT         Path to input QTL file for all chromosomes; 'gene,window_size,outcome,predictor,beta,std_err,r2,p_value,N,predictor_freq' as header.
+  --output OUTPUT       Path to the output QTL file with additional two fields - rejected and pvalue-corrected.
+  --rejected, --no-rejected
+                        Set this option to only print results where the null hypothesis was rejected (i.e., statistically significant associations). (default: False)
+  --drop_na, --no-drop_na
+                        Drop any cases where p value is listed as NA. (default: False)
+  --top_hit_per_gene, --no-top_hit_per_gene
+                        Print only most significant hit per gene. (default: False)
+  --top_hit_per_region, --no-top_hit_per_region
+                        Print only most significant hit per methylation region. (default: False)
+  --unique_hits, --no-unique_hits
+                        Print only unique set of included tests. (default: False)
+```
+```
+usage: long_read_QTL_data_visualization.py [-h] --input_combinations INPUT_COMBINATIONS --genetic_data GENETIC_DATA --methylation_data METHYLATION_DATA --output_prefix OUTPUT_PREFIX [--trans_comparison | --no-trans_comparison]
+                                           [--violin_plot | --no-violin_plot] [--strip_plot | --no-strip_plot]
+
+Generate boxplot/violinplot phenotype distribution visualizations and merged tables for particular phenotype/variant combinations.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --input_combinations INPUT_COMBINATIONS
+                        Headerless CSV file with list of comma-separated phenotype/variant combinations to be analyzed.
+  --genetic_data GENETIC_DATA
+                        Path to genetic data input file; format described in CARDlongread_data_standardization repository.
+  --methylation_data METHYLATION_DATA
+                        Path to methylation data input file; format described in CARDlongread_data_standardization repository.
+  --output_prefix OUTPUT_PREFIX
+                        Prefix for output files (plot and table per variant/phenotype combination).
+  --trans_comparison, --no-trans_comparison
+                        Show violin plots instead of box plots (optional; default false) (default: False)
+  --violin_plot, --no-violin_plot
+                        Show violin plots instead of box plots (optional; default false) (default: False)
+  --strip_plot, --no-strip_plot
+                        Show strip plots instead of swarm plots inside box/violin plots (optional; default false) (default: False)
+```
 ## Comparison with standard QTL results
