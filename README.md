@@ -6,7 +6,7 @@ This is the repository for the allele-specifc QTL pipeline developed by the CARD
 ## Containerization
 ## Metadata considerations
 ## Variant filtering
-We have initially filtered SNVs and SVs used for the allele-specific QTL analysis both to match filtering parameters used in [our past standard mQTL analyses](https://www.biorxiv.org/content/10.1101/2024.12.16.628723v1) and to reduce run time and significant variants to examine.
+We have initially filtered SNVs and SVs used for the allele-specific QTL analysis both to match filtering parameters used in [our past standard mQTL analyses](https://www.biorxiv.org/content/10.1101/2024.12.16.628723v1) and to reduce run time and significant variants to examine. Our default filtering parameters are variants with a minor allele frequency (amongst samples) of over 5%, a genotyping rate of 95% or higher, and a Hardy-Weinberg equilibrium p-value cutoff of 0.001. We performed additional, initial linkage disequilibrium (LD) pruning for our allele-specific mQTL, pruning variants with a pairwise correlation coefficient (r<sup>2</sup>) of 0.3 or higher within a 1000 variant count window with 50 variant steps between windows.
 ```
 Usage: ./long_read_QTL_initial_variant_filtering.sh -i input_prefix -s sample_exclude_list -m maf_cutoff -g missing_genotype_rate -h hwe_pvalue -p indep_pairwise_ld_pruning_values
 	-i Input VCF file prefix
