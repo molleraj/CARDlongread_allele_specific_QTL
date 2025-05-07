@@ -96,3 +96,20 @@ optional arguments:
                         Show strip plots instead of swarm plots inside box/violin plots (optional; default false) (default: False)
 ```
 ## Comparison with standard QTL results
+```
+usage: long_read_QTL_comparison.py [-h] --tensor_QTL TENSOR_QTL --allele_specific_QTL ALLELE_SPECIFIC_QTL --region_type REGION_TYPE --output_prefix OUTPUT_PREFIX
+
+Compare allele-specific QTL output to tensorQTL output on common methylation region. Print common regions and those unique to each.
+
+options:
+  -h, --help            show this help message and exit
+  --tensor_QTL TENSOR_QTL
+                        Path to input tensorQTL tsv file for comparisons; 'phenotype_id variant_id af pval_nominal slope slope_se pval_perm bh_fdr qval Chromosome TOP SV ID TOP SV Causal Post Probablity TOP SNV ID TOP SNV Causal Post
+                        Probablity' as header.
+  --allele_specific_QTL ALLELE_SPECIFIC_QTL
+                        Path to input allele-specific QTL file for comparisons; 'gene,window_size,outcome,predictor,beta,std_err,r2,p_value,N,predictor_freq' as header.
+  --region_type REGION_TYPE
+                        Region type (CGI for CpG islands, GB for gene bodies, PROM for promoters).
+  --output_prefix OUTPUT_PREFIX
+                        Prefix for output files with tensorQTL only, allele-specific QTL only, and common hits.
+```
