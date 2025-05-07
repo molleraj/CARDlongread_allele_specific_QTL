@@ -1,8 +1,10 @@
 # NIA CARD Long Read Sequencing Allele-Specific Quantitative Trait Locus (QTL) Analysis Pipeline
 This is the repository for the allele-specifc QTL pipeline developed by the CARD long-read sequencing/applied neurogenomics group. We developed a pipeline to perform allele-specific quantitative trait locus (QTL) analysis on phased, harmonized genetic variant and methylation data initially generated for NABEC and HBCC cohorts. Existing QTL pipelines take unphased variant and phenotype data as input. We anticipated that an allele-specific analysis might capture haplotype-specific signals washed out in unphased data, particularly for methylation. Future development will extend this pipeline to handle more types of omic phenotypic data.
+
 ## Pipeline overview
 ## Dependencies
 ## Containerization
+## Metadata considerations
 ## Variant filtering
 We have initially filtered SNVs and SVs used for the allele-specific QTL analysis both to match filtering parameters used in [our past standard mQTL analyses](https://www.biorxiv.org/content/10.1101/2024.12.16.628723v1) and to reduce run time and significant variants to examine.
 ```
@@ -16,6 +18,7 @@ Usage: ./long_read_QTL_initial_variant_filtering.sh -i input_prefix -s sample_ex
 ```
 ## Input data standardization
 Input data for the QTL pipeline must be standardized in the formats listed in the [CARDlongread_data_standardization](https://github.com/NIH-CARD/CARDlongread_data_standardization) repository using the included scripts. The goal of this standardization is to convert metadata, phased genetic variants, and phased methylation data into a haplotype-specific form ready for downstream QTL and machine learning analysis. Filtered variants from the step above should be used as genetic variant input to generate respective maps and data matrices.
+
 ## Running the allele-specific QTL
 ```
 usage: long_read_QTLs.py [-h] --chromosome CHROMOSOME --roi_map ROI_MAP --genetic_data GENETIC_DATA --methylation_data METHYLATION_DATA --genetic_map GENETIC_MAP --methylation_map METHYLATION_MAP --metadata METADATA --output OUTPUT
