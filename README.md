@@ -15,7 +15,7 @@ Usage: ./long_read_QTL_initial_variant_filtering.sh -i input_prefix -s sample_ex
 	-p Independent pairwise LD pruning settings (default "1000 50 0.3"). Numbers indicate window, step size, and r2 value for indep-pairwise pruning.
 ```
 ## Input data standardization
-Input data for the QTL pipeline must be standardized in the formats listed in the [CARDlongread_data_standardization](https://github.com/NIH-CARD/CARDlongread_data_standardization) repository using the included scripts. Filtered variants from the step above should be used as genetic variant input to generate respective maps and data matrices.
+Input data for the QTL pipeline must be standardized in the formats listed in the [CARDlongread_data_standardization](https://github.com/NIH-CARD/CARDlongread_data_standardization) repository using the included scripts. The goal of this standardization is to convert metadata, phased genetic variants, and phased methylation data into a haplotype-specific form ready for downstream QTL and machine learning analysis. Filtered variants from the step above should be used as genetic variant input to generate respective maps and data matrices.
 ## Running the allele-specific QTL
 ```
 usage: long_read_QTLs.py [-h] --chromosome CHROMOSOME --roi_map ROI_MAP --genetic_data GENETIC_DATA --methylation_data METHYLATION_DATA --genetic_map GENETIC_MAP --methylation_map METHYLATION_MAP --metadata METADATA --output OUTPUT
