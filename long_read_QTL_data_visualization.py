@@ -22,7 +22,7 @@ def parse_args():
     # set prefix for output files
     parser.add_argument("--output_prefix", required=True, help="Prefix for output files (plot and table per variant/phenotype combination).")
     # compare phenotype for haplotype across both genotype haplotypes (trans comparison)
-    parser.add_argument('--trans_comparison', action=argparse.BooleanOptionalAction, default=False, dest="trans_comparison", help="Show violin plots instead of box plots (optional; default false)")
+    # parser.add_argument('--trans_comparison', action=argparse.BooleanOptionalAction, default=False, dest="trans_comparison", help="Show violin plots instead of box plots (optional; default false)")
     # add option for violinplot instead of boxplot
     parser.add_argument('--violin_plot', action=argparse.BooleanOptionalAction, default=False, dest="violin_plot", help="Show violin plots instead of box plots (optional; default false)")
     # add option for stripplot instead of swarmplot (in case of excessive data points)
@@ -35,14 +35,14 @@ def plot_phenotypes(merged_data,variant_name,phenotype_name,violin_plot,strip_pl
     fig, ax = plt.subplots()
     # different plots depending on whether violin_plot variable is set to true or not
     if violin_plot is True:
-        ax = sb.violinplot(data=merged_data,x=variant_name,y=phenotype_name,hue='HAPLOTYPE',color='white',inner="quartile")
+        ax = sb.violinplot(data=merged_data,x=variant_name,y=phenotype_name,color='white',inner="quartile")
     else:
-        ax = sb.boxplot(data=merged_data,x=variant_name,y=phenotype_name,hue='HAPLOTYPE',color='white')
+        ax = sb.boxplot(data=merged_data,x=variant_name,y=phenotype_name,color='white')
     # different overlayed point plots depending on whether strip_plot is set 
     if strip_plot is True:
-        ax = sb.stripplot(data=merged_data,x=variant_name,y=phenotype_name,hue='HAPLOTYPE',ax=ax,dodge=True)
+        ax = sb.stripplot(data=merged_data,x=variant_name,y=phenotype_name,ax=ax,dodge=True)
     else:
-        ax = sb.swarmplot(data=merged_data,x=variant_name,y=phenotype_name,hue='HAPLOTYPE',ax=ax,dodge=True)
+        ax = sb.swarmplot(data=merged_data,x=variant_name,y=phenotype_name,ax=ax,dodge=True)
     # print phenotype plot to png file
     fig.savefig(output_prefix + "_" + phenotype_name + "_" + variant_name + "_phenotype_plot.png", format='png', dpi=200, bbox_inches='tight')
     # close figure
@@ -75,12 +75,12 @@ def main():
         # subset methylation data on current region of interest
         methylation_data_subset_df=methylation_data_df[['SAMPLE','HAPLOTYPE',current_phenotype]]
         # cis or trans comparison depending on input setting
-        if args.trans_comparison is True:
-            # merge genetic and methylation data on sample column alone
-            merged_subset_df=pd.merge(genetic_data_subset_df,methylation_data_subset_df,on=['SAMPLE'])
-        else:
-            # merge genetic and methylation data on sample and haplotype columns
-            merged_subset_df=pd.merge(genetic_data_subset_df,methylation_data_subset_df,on=['SAMPLE','HAPLOTYPE'])
+        # if args.trans_comparison is True:
+        # merge genetic and methylation data on sample column alone
+        merged_subset_df=pd.merge(genetic_data_subset_df,methylation_data_subset_df,on=['SAMPLE'])
+        # else:
+        # merge genetic and methylation data on sample and haplotype columns
+        # merged_subset_df=pd.merge(genetic_data_subset_df,methylation_data_subset_df,on=['SAMPLE','HAPLOTYPE'])
         # make plot of current variant/phenotype pair
         # generate boxplots/violinplots with overlaid strip or swarmplots
         plot_phenotypes(merged_subset_df,current_variant,current_phenotype,args.violin_plot,args.strip_plot,args.output_prefix)
