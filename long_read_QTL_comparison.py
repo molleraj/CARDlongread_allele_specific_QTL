@@ -110,6 +110,9 @@ def main():
     tensor_QTL_only_df.to_csv(args.output_prefix + "_tensor_QTL_only.csv",index=False)
     allele_specific_QTL_only_df.to_csv(args.output_prefix + "_allele_specific_QTL_only.csv",index=False)
     
+    # make histogram and scatterplot of common hits' betas
+    common_hits_visualizations(merged_QTL_df,args.output_prefix,args.plot_title)
+    
     # Print runtime and max RAM usage
     end_time = time.time()
     print(f"Execution Time: {end_time - start_time:.2f} seconds")
