@@ -76,8 +76,10 @@ def main():
         numeric_vars = covariates.drop(columns=non_numeric_cols)
         metadata_reformed = pd.concat([metadata[['SAMPLE']], numeric_vars, dummy_vars], axis=1)
         
-        # Merge all data - merge genetic data, methylation data, and metadata on SAMPLE column
-        merged_data = genetic_data.merge(methylation_data, on='SAMPLE').merge(metadata_reformed, on='SAMPLE')
+        # Merge all data - merge genetic data, methylation data, and metadata on SAMPLE and HAPLOTYPE columns (genetics + methylation)
+        # This is based on the assumption that for each sample, genetics H1 and methylation H1 match
+        # In future offer command line option to examine all haplotype combinations per sample, or trans haplotype combos
+        merged_data = genetic_data.merge(methylation_data, on=['SAMPLE','HAPLOTYPE']).merge(metadata_reformed, on='SAMPLE')
         
         # Subset to relevant columns
         # I think TARGET is the name of the methylation region
