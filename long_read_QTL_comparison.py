@@ -64,9 +64,9 @@ def common_hits_visualizations(common_QTL_hits_df,output_prefix,plot_title):
     fig, ax = plt.subplots()
     # overlay unphased betas over phased betas
     # phased betas
-    ax = sb.histplot(data=common_QTL_hits_df,x=beta,label="Phased")
+    ax = sb.histplot(data=common_QTL_hits_df,x='beta',label="Phased")
     # unphased betas
-    sb.histplot(data=common_QTL_hits_df,x=slope,label="Unphased",ax=ax)
+    sb.histplot(data=common_QTL_hits_df,x='slope',label="Unphased",ax=ax)
     # set axis labels
     ax.set(xlabel="Beta",ylabel="Frequency")
     # include legend
@@ -78,7 +78,7 @@ def common_hits_visualizations(common_QTL_hits_df,output_prefix,plot_title):
     # output unphased vs. phased betas as scatterplot with linear regression line
     # print scatterplot with regression line
     fig, ax = plt.subplots()
-    ax = sb.regplot(data=common_QTL_hits_df,x=slope,y=beta)
+    ax = sb.regplot(data=common_QTL_hits_df,x='slope',y='beta')
     # set axis labels
     ax.set(xlabel="Unphased beta",ylabel="Phased beta")
     if plot_title is not None:
