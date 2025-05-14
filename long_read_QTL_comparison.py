@@ -3,6 +3,8 @@
 # import modules first
 import pandas as pd
 import numpy as np
+import seaborn as sb
+import matplotlib.pyplot as plt
 import time
 import psutil
 import argparse
@@ -14,6 +16,7 @@ def parse_args():
     parser.add_argument("--tensor_QTL", required=True, help="Path to input tensorQTL tsv file for comparisons; 'phenotype_id	variant_id	af	pval_nominal	slope	slope_se	pval_perm	bh_fdr	qval	Chromosome	TOP SV ID	TOP SV Causal Post Probablity	TOP SNV ID	TOP SNV Causal Post Probablity' as header.")
     parser.add_argument("--allele_specific_QTL", required=True, help="Path to input allele-specific QTL file for comparisons; 'gene,window_size,outcome,predictor,beta,std_err,r2,p_value,N,predictor_freq' as header.")
     parser.add_argument("--region_type", required=True, help="Region type (CGI for CpG islands, GB for gene bodies, PROM for promoters).")
+    parser.add_argument("--plot_title", required=False, help="Title for beta comparison histogram and scatterplot.")
     parser.add_argument("--output_prefix", required=True, help="Prefix for output files with tensorQTL only, allele-specific QTL only, and common hits.")
     return parser.parse_args()
 
@@ -56,6 +59,34 @@ def merge_tables(tensorQTL_df,allele_spec_QTL_df,region_type):
     
 # get hits only in one or other data frame    
 # def get_excluded_hits():
+def common_hits_visualizations(common_QTL_hits_df,output_prefix,plot_title):
+    # output beta histogram
+    fig, ax = plt.subplots()
+    # overlay unphased betas over phased betas
+    # phased betas
+    ax = sb.histplot(data=common_QTL_hits_df,x=beta,label="Phased")
+    # unphased betas
+    sb.histplot(data=common_QTL_hits_df,x=slope,label="Unphased",ax=ax)
+    # set axis labels
+    ax.set(xlabel="Beta",ylabel="Frequency")
+    # include legend
+    plt.legend()
+    # save histogram figure
+    fig.savefig(output_prefix + "_beta_histogram.png", format='png', dpi=300, bbox_inches='tight')
+    # close figure
+    fig.clf()
+    # output unphased vs. phased betas as scatterplot with linear regression line
+    # print scatterplot with regression line
+    fig, ax = plt.subplots()
+    ax = sb.regplot(data=common_QTL_hits_df,x=slope,y=beta)
+    # set axis labels
+    ax.set(xlabel="Unphased beta",ylabel="Phased beta")
+    if plot_title is not None:
+        ax.set(title=plot_title)
+    # save scatterplot figure
+    fig.savefig(output_prefix + "_beta_scatterplot.png", format='png', dpi=300, bbox_inches='tight')
+    # close figure
+    fig.clf()
     
 # main script subroutine    
 def main():
