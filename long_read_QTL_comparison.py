@@ -62,15 +62,21 @@ def merge_tables(tensorQTL_df,allele_spec_QTL_df,region_type):
 def common_hits_visualizations(common_QTL_hits_df,output_prefix,plot_title):
     # output beta histogram
     fig, ax = plt.subplots()
-    # overlay unphased betas over phased betas
-    # phased betas
-    ax = sb.histplot(data=common_QTL_hits_df,x='beta',label="Phased")
-    # unphased betas
-    sb.histplot(data=common_QTL_hits_df,x='slope',label="Unphased",ax=ax)
+    # show unphased betas grouped side by side with phased betas
+    # first create unphased and phased variables
+    common_QTL_hits_df['Unphased']=common_QTL_hits_df['slope']
+    common_QTL_hits_df['Phased']=common_QTL_hits_df['beta']
+    # now melt on these variables
+    common_QTL_hits_df_melted=common_QTL_hits_df.melt(value_vars=['Unphased', 'Phased'],
+                    var_name='QTL type', 
+                    value_name='Beta')
+    # then make grouped 
+    sb.histplot(data=common_QTL_hits_df_melted,x='Beta',hue='QTL type')
     # set axis labels
     ax.set(xlabel="Beta",ylabel="Frequency")
-    # include legend
-    plt.legend()
+    # set plot title if defined
+    if plot_title is not None:
+        ax.set(title=plot_title)
     # save histogram figure
     fig.savefig(output_prefix + "_beta_histogram.png", format='png', dpi=300, bbox_inches='tight')
     # close figure
@@ -81,6 +87,7 @@ def common_hits_visualizations(common_QTL_hits_df,output_prefix,plot_title):
     ax = sb.regplot(data=common_QTL_hits_df,x='slope',y='beta')
     # set axis labels
     ax.set(xlabel="Unphased beta",ylabel="Phased beta")
+    # set plot title if defined
     if plot_title is not None:
         ax.set(title=plot_title)
     # save scatterplot figure
