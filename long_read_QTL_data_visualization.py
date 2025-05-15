@@ -13,7 +13,7 @@ import os
 # parse command line arguments
 def parse_args():
     parser = argparse.ArgumentParser(description="Generate boxplot/violinplot phenotype distribution visualizations and merged tables for particular phenotype/variant combinations.")
-    # import list of variant/phenotype combinations with tabs separating phenotype from 
+    # import list of variant/phenotype combinations with tabs separating phenotype from CSV file
     parser.add_argument("--input_combinations", required=True, help="Headerless CSV file with list of comma-separated phenotype/variant combinations to be analyzed.")
     # import genetic data table
     parser.add_argument("--genetic_data", required=True, help="Path to genetic data input file; format described in CARDlongread_data_standardization repository.")
