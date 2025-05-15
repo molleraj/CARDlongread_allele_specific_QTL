@@ -4,6 +4,7 @@ This is the repository for the allele-specifc QTL pipeline developed by the CARD
 ## Pipeline overview
 ## Dependencies
 ## Containerization
+## Resource use considerations
 ## Metadata considerations
 As described in our [data standardization](https://github.com/NIH-CARD/CARDlongread_data_standardization) repository, we have prepared scripts to guide the exploratory data analysis (EDA) process, particularly calculation of PCs, evaluation of PC contribution through stepwise regression, and merging with covariates. We have written two scripts to perform principal component analysis on different types of data (e.g., genetic variants, methylation, gene expression) and then join chosen principal components with a standard sample metadata table. The first script (```make_pcs_stepwise.py```) runs PCA on different input data types and creates scree plots to assist choice of PCs that explain most of the variation in the data. It includes options for each data type and for the PC prefix (e.g., GENETIC_ and thus GENETIC_PC for PCs from genetic variant data). The second script (```choose_pcs_join_metadata.py```) takes a list of input PC files from the first script and a list of values that indicate the number of PCs to include (starting from PC_1) from each PC file.
 
@@ -120,3 +121,4 @@ optional arguments:
   --output_prefix OUTPUT_PREFIX
                         Prefix for output files with tensorQTL only, allele-specific QTL only, and common hits.
 ```
+### Finding nearest and overlapping genes per hit (variant and region)
