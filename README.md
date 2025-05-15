@@ -121,4 +121,5 @@ optional arguments:
   --output_prefix OUTPUT_PREFIX
                         Prefix for output files with tensorQTL only, allele-specific QTL only, and common hits.
 ```
-### Finding nearest and overlapping genes per hit (variant and region)
+## Finding nearest and overlapping genes per hit (variant and region)
+## Tutorial
