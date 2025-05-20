@@ -12,9 +12,9 @@ import argparse
 
 # parse command line arguments
 def parse_args():
-    parser = argparse.ArgumentParser(description="Perform exploratory data analysis (EDA) by running PCA on input data (genetics, methylation, or expression) and generating a scree plot to assist selection of PCs.")
+    parser = argparse.ArgumentParser(description="Perform exploratory data analysis (EDA) by running PCA for 20 PCs on input data (genetics, methylation, or expression) and generating a scree plot to assist selection of PCs.")
     # specify input data type (genetics, methylation, or expression)
-    parser.add_argument("--input_type", required=True, help="Input file type (currently genetics, methylation, or expression). Genetics input is Plink eigenvalue/eigenvector files generated with the --pca option, while methylation input is a methylation BED file and expression input is a normalized expression BED file.")
+    parser.add_argument("--input_type", required=True, help="Input file type (currently genetics, methylation, or expression). Genetics input is Plink eigenvalue/eigenvector files generated with the --pca 20 option, while methylation input is a methylation BED file and expression input is a normalized expression BED file.")
     # specify path to input file
     parser.add_argument("--input", required=True, help="Path to input genetics file prefix (for both Plink eigenvalue/eigenvector) or methylation/expression input file.")
     # specify output prefix
@@ -38,10 +38,15 @@ def preprocess_genetic_inputs(plink_eigenvalues,plink_eigenvectors,pc_prefix):
     plink_variance_explained_ratios = plink_eigenvalues/sum(plink_eigenvalues[0])
     # make copy of original eigenvectors DF
     plink_preprocessed_eigenvectors=plink_eigenvectors.copy()
-    # rename plink eigenvector #IID column to SAMPLE
-    plink_preprocessed_eigenvectors.rename(columns={'#IID': 'SAMPLE'}, inplace=True)
+    # rename plink eigenvector #IID or IID column to SAMPLE
+    if '#IID' in plink_preprocessed_eigenvectors.columns:
+        plink_preprocessed_eigenvectors.rename(columns={'#IID': 'SAMPLE'}, inplace=True)
+    elif 'IID' in plink_preprocessed_eigenvectors.columns:
+        plink_preprocessed_eigenvectors.rename(columns={'IID': 'SAMPLE'}, inplace=True)
+    # get PC columns from eigenvectors column
+    plink_eigenvector_PC_columns=plink_eigenvectors.columns[plink_eigenvectors.columns.str.contains('PC')]
     # relabel plink eigenvectors with PC prefix (e.g., GENETIC_)
-    plink_eigenvectors_new_PC_names=[(i,pc_prefix+i) for i in plink_eigenvectors.iloc[:,1:].columns.values]
+    plink_eigenvectors_new_PC_names=[(i,pc_prefix+i) for i in plink_eigenvector_PC_columns.values]
     plink_preprocessed_eigenvectors.rename(columns=dict(plink_eigenvectors_new_PC_names), inplace=True)
     # return plink variance explained ratios and relabeled eigenvectors (PCs)
     return(plink_variance_explained_ratios,plink_preprocessed_eigenvectors)
@@ -117,8 +122,11 @@ def make_scree_plot(variance_explained_ratios,cumulative_variance_explained_cuto
     # calculate cumulative variance explained ratios
     cumulative_variance_explained_ratios=variance_explained_ratios.cumsum()
     # print PC upon which cumulative variance explained exceeds threshold IF any PCs exceed threshold
-    if (len(cumulative_variance_explained_ratios[cumulative_variance_explained_ratios>0.7]) > 0):
-        pc_exceeding_threshold = np.nanargmin(cumulative_variance_explained_ratios[cumulative_variance_explained_ratios>cumulative_variance_explained_cutoff])+1
+    if (len(cumulative_variance_explained_ratios[cumulative_variance_explained_ratios>cumulative_variance_explained_cutoff]) > 0):
+        # print(cumulative_variance_explained_ratios)
+        # pc_exceeding_threshold = np.nanargmin(cumulative_variance_explained_ratios[cumulative_variance_explained_ratios>cumulative_variance_explained_cutoff])+1
+        # use np.argmax to find first true value instead
+        pc_exceeding_threshold = np.argmax(cumulative_variance_explained_ratios>cumulative_variance_explained_cutoff)+1
         print("Cumulative variance exceeds " + str(cumulative_variance_explained_cutoff) + " threshold starting with PC" + pc_exceeding_threshold.astype(str))
     else:
         print("Cumulative variance below threshold for all 20 PCs.")
@@ -167,7 +175,7 @@ def main():
         # load eigenvectors (genetic PCs) file
         genetics_eigenvectors = pd.read_csv(args.input + ".eigenvec", sep="\t")
         # convert to data to relabeled PC table and variance explained ratios array
-        (genetics_variance_explained_ratios,genetics_preprocessed_eigenvectors)=preprocess_genetic_inputs(genetics_eigenvalues,genetics_eigenvectors,pc_prefix)
+        (genetics_variance_explained_ratios,genetics_preprocessed_eigenvectors)=preprocess_genetic_inputs(genetics_eigenvalues,genetics_eigenvectors,args.pc_prefix)
         # generate scree plot
         make_scree_plot(genetics_variance_explained_ratios[0],args.cumulative_variance_explained_cutoff,args.output_prefix,args.plot_title)
         # relabel samples if specified
