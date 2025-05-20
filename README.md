@@ -7,7 +7,45 @@ This is the repository for the allele-specifc QTL pipeline developed by the CARD
 ## Resource use considerations
 ## Metadata considerations
 As described in our [data standardization](https://github.com/NIH-CARD/CARDlongread_data_standardization) repository, we have prepared scripts to guide the exploratory data analysis (EDA) process, particularly calculation of PCs, evaluation of PC contribution through stepwise regression, and merging with covariates. We have written two scripts to perform principal component analysis on different types of data (e.g., genetic variants, methylation, gene expression) and then join chosen principal components with a standard sample metadata table. The first script (```make_pcs_stepwise.py```) runs PCA on different input data types and creates scree plots to assist choice of PCs that explain most of the variation in the data. It includes options for each data type and for the PC prefix (e.g., GENETIC_ and thus GENETIC_PC for PCs from genetic variant data). The second script (```choose_pcs_join_metadata.py```) takes a list of input PC files from the first script and a list of values that indicate the number of PCs to include (starting from PC_1) from each PC file.
+```
+usage: make_pcs_stepwise.py [-h] --input_type INPUT_TYPE --input INPUT --output_prefix OUTPUT_PREFIX --pc_prefix PC_PREFIX [--cumulative_variance_explained_cutoff CUMULATIVE_VARIANCE_EXPLAINED_CUTOFF] [--plot_title PLOT_TITLE]
+                            [--new_sample_names NEW_SAMPLE_NAMES]
 
+Perform exploratory data analysis (EDA) by running PCA for 20 PCs on input data (genetics, methylation, or expression) and generating a scree plot to assist selection of PCs.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --input_type INPUT_TYPE
+                        Input file type (currently genetics, methylation, or expression). Genetics input is Plink eigenvalue/eigenvector files generated with the --pca 20 option, while methylation input is a methylation BED file and
+                        expression input is a normalized expression BED file.
+  --input INPUT         Path to input genetics file prefix (for both Plink eigenvalue/eigenvector) or methylation/expression input file.
+  --output_prefix OUTPUT_PREFIX
+                        Prefix for PC and scree plot output files.
+  --pc_prefix PC_PREFIX
+                        Prefix for PC names (e.g., METH_PC1).
+  --cumulative_variance_explained_cutoff CUMULATIVE_VARIANCE_EXPLAINED_CUTOFF
+                        Horizontal cutoff line for cumulative variance explained in scree plot (default 0.70). PC that exceeds threshold printed to standard output.
+  --plot_title PLOT_TITLE
+                        Title for output scree plot.
+  --new_sample_names NEW_SAMPLE_NAMES
+                        Path to list of new sample names for output PC file. Must have same number of samples as input data file.
+```
+```
+usage: choose_pcs_join_metadata.py [-h] --input_metadata INPUT_METADATA --input_pcs INPUT_PCS [INPUT_PCS ...] --pc_counts PC_COUNTS [PC_COUNTS ...] --output_prefix OUTPUT_PREFIX
+
+Choose PCs from multiple input PC files and merge chosen PCs with metadata/covariates table.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --input_metadata INPUT_METADATA
+                        Path to initial input metadata/covariates file to be joined with PCs of interest.
+  --input_pcs INPUT_PCS [INPUT_PCS ...]
+                        Path to input PC files generated or preprocessed with make_pcs_stepwise.py.
+  --pc_counts PC_COUNTS [PC_COUNTS ...]
+                        Number of PCs starting with PC1 to retain for input PC files, in order of inputs specified for --input_pcs.
+  --output_prefix OUTPUT_PREFIX
+                        Specify prefix for output merged metadata/covariates/PCs file and covariate correlation heatmap.
+```
 ## Variant filtering
 We have initially filtered SNVs and SVs used for the allele-specific QTL analysis both to match filtering parameters used in [our past standard mQTL analyses](https://www.biorxiv.org/content/10.1101/2024.12.16.628723v1) and to reduce run time and significant variants to examine. Our default filtering parameters are variants with a minor allele frequency (amongst samples) of over 5%, a genotyping rate of 95% or higher, and a Hardy-Weinberg equilibrium p-value cutoff of 0.001. We performed additional, initial linkage disequilibrium (LD) pruning for our allele-specific mQTL, pruning variants with a pairwise correlation coefficient (r<sup>2</sup>) of 0.3 or higher within a 1000 variant count window with 50 variant steps between windows.
 ```
