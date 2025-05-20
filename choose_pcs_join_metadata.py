@@ -18,6 +18,8 @@ def parse_args():
     parser.add_argument("--pc_counts", required=True, nargs="+", help="Number of PCs starting with PC1 to retain for input PC files, in order of inputs specified for --input_pcs.")
     # specify prefix for output files
     parser.add_argument("--output_prefix", required=True, help="Specify prefix for output merged metadata/covariates/PCs file and covariate correlation heatmap.")
+    # return arguments
+    return parser.parse_args()
     
 # join tables on sample columns
 def join_metadata_pc_tables(input_metadata_data_frame,input_pc_data_frames,input_pc_counts):
@@ -64,7 +66,7 @@ def main():
     input_metadata_df=pd.read_csv(args.input_metadata)
     # import pc data frames
     input_pc_data_frame_list=[0] * len(args.input_pcs)
-    for idx, i in args.input_pcs
+    for idx, i in args.input_pcs:
         input_pc_data_frame_list[idx]=pd.read_csv(i)
     # merge pc data frames with metadata data frame on SAMPLE column
     output_merged_metadata_pc_df=join_metadata_pc_tables(input_metadata_df,input_pc_data_frame_list,args.pc_counts)
