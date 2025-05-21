@@ -48,6 +48,9 @@ def preprocess_genetic_inputs(plink_eigenvalues,plink_eigenvectors,pc_prefix):
     # relabel plink eigenvectors with PC prefix (e.g., GENETIC_)
     plink_eigenvectors_new_PC_names=[(i,pc_prefix+i) for i in plink_eigenvector_PC_columns.values]
     plink_preprocessed_eigenvectors.rename(columns=dict(plink_eigenvectors_new_PC_names), inplace=True)
+    # remove remaining columns
+    keep_columns=plink_preprocessed_eigenvectors.columns[plink_preprocessed_eigenvectors.columns.str.contains("SAMPLE|PC")]
+    plink_preprocessed_eigenvectors=plink_preprocessed_eigenvectors[keep_columns]
     # return plink variance explained ratios and relabeled eigenvectors (PCs)
     return(plink_variance_explained_ratios,plink_preprocessed_eigenvectors)
 
@@ -58,7 +61,11 @@ def preprocess_data_table(input_data_type,input_data_frame):
     if (input_data_type == "methylation"):
         # handle methylation BED file
         # get columns with methylation levels - include avgMod or modFraction in name
-        methylation_columns=input_data_frame.columns[input_data_frame.columns.str.contains('Mod|mod')]
+        if any(input_data_frame.columns.str.contains('Mod|mod')) is True:
+            methylation_columns=input_data_frame.columns[input_data_frame.columns.str.contains('Mod|mod')]
+        # case where Mod/mod not in BED file
+        else:
+            methylation_columns=input_data_frame.columns[4:]
         # make new data frame with methylation data only
         methylation_only_df=input_data_frame[methylation_columns]
         # correct names of methylation columns
@@ -189,7 +196,7 @@ def main():
         # preprocess data
         methylation_preprocessed_data_frame = preprocess_data_table('methylation',methylation_input_df)
         # run PCA
-        (methylation_df_pcs,methylation_variance_explained_ratios)=run_pca(methylation_preprocessed_data_frame,pc_prefix)
+        (methylation_df_pcs,methylation_variance_explained_ratios)=run_pca(methylation_preprocessed_data_frame,args.pc_prefix)
         # generate scree plot
         make_scree_plot(methylation_variance_explained_ratios,args.cumulative_variance_explained_cutoff,args.output_prefix,args.plot_title)
         # relabel samples if specified
@@ -203,7 +210,7 @@ def main():
         # preprocess data
         expression_preprocessed_data_frame = preprocess_data_table('expression',expression_input_df)
         # run PCA
-        (expression_df_pcs,expression_variance_explained_ratios)=run_pca(expression_preprocessed_data_frame,pc_prefix)
+        (expression_df_pcs,expression_variance_explained_ratios)=run_pca(expression_preprocessed_data_frame,args.pc_prefix)
         # generate scree plot
         make_scree_plot(expression_variance_explained_ratios,args.cumulative_variance_explained_cutoff,args.output_prefix,args.plot_title)
         # relabel samples if specified

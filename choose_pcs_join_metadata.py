@@ -28,7 +28,7 @@ def join_metadata_pc_tables(input_metadata_data_frame,input_pc_data_frames,input
     # loop through input pc tables
     for idx, i in enumerate(input_pc_data_frames):
         # subset for first x pcs specified in corresponding element of input_pc_counts array
-        current_input_pc_data_frame_subset=i.iloc[:,0:(input_pc_counts[idx]+1)]
+        current_input_pc_data_frame_subset=i.iloc[:,0:(int(input_pc_counts[idx])+1)]
         # merge this subset with initial data frame
         # merge subset pc table with existing merged data table on SAMPLE column using inner join
         merged_metadata_pc_data_frame=merged_metadata_pc_data_frame.merge(current_input_pc_data_frame_subset,on='SAMPLE')
@@ -66,7 +66,7 @@ def main():
     input_metadata_df=pd.read_csv(args.input_metadata)
     # import pc data frames
     input_pc_data_frame_list=[0] * len(args.input_pcs)
-    for idx, i in args.input_pcs:
+    for idx, i in enumerate(args.input_pcs):
         input_pc_data_frame_list[idx]=pd.read_csv(i)
     # merge pc data frames with metadata data frame on SAMPLE column
     output_merged_metadata_pc_df=join_metadata_pc_tables(input_metadata_df,input_pc_data_frame_list,args.pc_counts)
