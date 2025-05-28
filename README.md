@@ -86,6 +86,7 @@ optional arguments:
   --window_size WINDOW_SIZE
                         Window size for defining gene regions (default: 500000).
 ```
+## Parallelizing QTL by chromosome
 ## Postprocessing and data visualization
 ```
 usage: long_read_QTL_lambda.py [-h] --input INPUT
