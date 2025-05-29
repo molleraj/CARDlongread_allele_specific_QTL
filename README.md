@@ -2,6 +2,7 @@
 This is the repository for the allele-specifc QTL pipeline developed by the CARD long-read sequencing/applied neurogenomics group. We developed a pipeline to perform allele-specific quantitative trait locus (QTL) analysis on phased, harmonized genetic variant and methylation data initially generated for NABEC and HBCC cohorts. Existing QTL pipelines take unphased variant and phenotype data as input. We anticipated that an allele-specific analysis might capture haplotype-specific signals averaged out in unphased data, particularly for methylation. Future development will extend this pipeline to handle more types of omic phenotypic data.
 
 ## Pipeline overview
+![image](https://github.com/user-attachments/assets/0bab07c8-ef38-438c-bb94-08bf5f0c4122)
 ## Dependencies
 ## Containerization
 ## Resource use considerations
