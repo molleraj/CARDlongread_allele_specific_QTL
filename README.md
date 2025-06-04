@@ -120,7 +120,7 @@ optional arguments:
                         Print only unique set of included tests. (default: False)
 ```
 ```
-usage: long_read_QTL_data_visualization.py [-h] --input_combinations INPUT_COMBINATIONS --genetic_data GENETIC_DATA --methylation_data METHYLATION_DATA --output_prefix OUTPUT_PREFIX [--trans_comparison | --no-trans_comparison]
+usage: long_read_QTL_data_visualization.py [-h] --input_combinations INPUT_COMBINATIONS --genetic_data GENETIC_DATA --methylation_data METHYLATION_DATA --output_prefix OUTPUT_PREFIX [--all_haps_comparison | --no-all_haps_comparison]
                                            [--violin_plot | --no-violin_plot] [--strip_plot | --no-strip_plot]
 
 Generate boxplot/violinplot phenotype distribution visualizations and merged tables for particular phenotype/variant combinations.
@@ -135,8 +135,8 @@ optional arguments:
                         Path to methylation data input file; format described in CARDlongread_data_standardization repository.
   --output_prefix OUTPUT_PREFIX
                         Prefix for output files (plot and table per variant/phenotype combination).
-  --trans_comparison, --no-trans_comparison
-                        Show violin plots instead of box plots (optional; default false) (default: False)
+  --all_haps_comparison, --no-all_haps_comparison
+                        Compare all genetic against all methylation haplotypes (genetic H1/H2 against methylation H1/H2). (default: False)
   --violin_plot, --no-violin_plot
                         Show violin plots instead of box plots (optional; default false) (default: False)
   --strip_plot, --no-strip_plot
