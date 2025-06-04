@@ -21,8 +21,8 @@ def parse_args():
     parser.add_argument("--methylation_data", required=True, help="Path to methylation data input file; format described in CARDlongread_data_standardization repository.")
     # set prefix for output files
     parser.add_argument("--output_prefix", required=True, help="Prefix for output files (plot and table per variant/phenotype combination).")
-    # compare phenotype for haplotype across both genotype haplotypes (trans comparison)
-    # parser.add_argument('--trans_comparison', action=argparse.BooleanOptionalAction, default=False, dest="trans_comparison", help="Show violin plots instead of box plots (optional; default false)")
+    # compare phenotype for haplotype across all genotype haplotypes (trans comparison)
+    parser.add_argument('--all_haps_comparison', action=argparse.BooleanOptionalAction, default=False, help="Compare all genetic against all methylation haplotypes (genetic H1/H2 against methylation H1/H2).")
     # add option for violinplot instead of boxplot
     parser.add_argument('--violin_plot', action=argparse.BooleanOptionalAction, default=False, dest="violin_plot", help="Show violin plots instead of box plots (optional; default false)")
     # add option for stripplot instead of swarmplot (in case of excessive data points)
@@ -75,12 +75,12 @@ def main():
         # subset methylation data on current region of interest
         methylation_data_subset_df=methylation_data_df[['SAMPLE','HAPLOTYPE',current_phenotype]]
         # cis or trans comparison depending on input setting
-        # if args.trans_comparison is True:
-        # merge genetic and methylation data on sample column alone
-        merged_subset_df=pd.merge(genetic_data_subset_df,methylation_data_subset_df,on=['SAMPLE'])
-        # else:
-        # merge genetic and methylation data on sample and haplotype columns
-        # merged_subset_df=pd.merge(genetic_data_subset_df,methylation_data_subset_df,on=['SAMPLE','HAPLOTYPE'])
+        if args.all_haps_comparison is True:
+            # merge genetic and methylation data on sample column alone
+            merged_subset_df=pd.merge(genetic_data_subset_df,methylation_data_subset_df,on=['SAMPLE'])
+        else:
+            # merge genetic and methylation data on sample and haplotype columns
+            merged_subset_df=pd.merge(genetic_data_subset_df,methylation_data_subset_df,on=['SAMPLE','HAPLOTYPE'])
         # make plot of current variant/phenotype pair
         # generate boxplots/violinplots with overlaid strip or swarmplots
         plot_phenotypes(merged_subset_df,current_variant,current_phenotype,args.violin_plot,args.strip_plot,args.output_prefix)

@@ -61,8 +61,8 @@ def preprocess_data_table(input_data_type,input_data_frame):
     if (input_data_type == "methylation"):
         # handle methylation BED file
         # get columns with methylation levels - include avgMod or modFraction in name
-        if any(input_data_frame.columns.str.contains('Mod|mod')) is True:
-            methylation_columns=input_data_frame.columns[input_data_frame.columns.str.contains('Mod|mod')]
+        if any(input_data_frame.columns.str.contains('avgMod|modFraction')) is True:
+            methylation_columns=input_data_frame.columns[input_data_frame.columns.str.contains('avgMod|modFraction')]
         # case where Mod/mod not in BED file
         else:
             methylation_columns=input_data_frame.columns[4:]
@@ -70,7 +70,10 @@ def preprocess_data_table(input_data_type,input_data_frame):
         methylation_only_df=input_data_frame[methylation_columns]
         # correct names of methylation columns
         methylation_only_df.columns = methylation_only_df.columns.str.removeprefix("avgMod_")
-        methylation_only_df.columns = methylation_only_df.columns.str.removesuffix("_GRCh38_1_modFraction") 
+        # haplotype 1 suffix
+        methylation_only_df.columns = methylation_only_df.columns.str.removesuffix("_GRCh38_1_modFraction")
+        # haplotype 2 suffix
+        methylation_only_df.columns = methylation_only_df.columns.str.removesuffix("_GRCh38_2_modFraction")
         # transpose to get samples as rows
         methylation_only_df = methylation_only_df.T
         # impute missing data as median - concern that mean maybe reflects outliers skewing distribution in one direction or other
