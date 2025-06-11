@@ -65,7 +65,7 @@ Input data for the QTL pipeline must be standardized in the formats listed in th
 ## Running the allele-specific QTL
 ```
 usage: long_read_QTLs.py [-h] --chromosome CHROMOSOME --roi_map ROI_MAP --genetic_data GENETIC_DATA --methylation_data METHYLATION_DATA --genetic_map GENETIC_MAP --methylation_map METHYLATION_MAP --metadata METADATA --output OUTPUT
-                         [--window_size WINDOW_SIZE]
+                         [--window_size WINDOW_SIZE] [--per_haplotype_missing_methylation_rate PER_HAPLOTYPE_MISSING_METHYLATION_RATE] [--per_haplotype_MAF PER_HAPLOTYPE_MAF] [--overall_MAF OVERALL_MAF]
 
 Perform QTL analysis with user-specified parameters. Input data formats described in CARDlongread_data_standardization repository.
 
@@ -86,6 +86,12 @@ optional arguments:
   --output OUTPUT       Output file destination for results.
   --window_size WINDOW_SIZE
                         Window size for defining gene regions (default: 500000).
+  --per_haplotype_missing_methylation_rate PER_HAPLOTYPE_MISSING_METHYLATION_RATE
+                        Proportion of methylation calls missing per haplotype to consider for corresponding MAF exclusion (default: 0.95).
+  --per_haplotype_MAF PER_HAPLOTYPE_MAF
+                        Minimum minor allele frequency per haplotype to run regression in the case of one haplotype with data (default: 0.05).
+  --overall_MAF OVERALL_MAF
+                        Minimum minor allele frequency for both haplotypes to run regression (default: 0.05).
 ```
 ## Parallelizing QTL by chromosome
 ## Postprocessing and data visualization
