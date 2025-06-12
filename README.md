@@ -106,13 +106,13 @@ optional arguments:
 ```
 ```
 usage: long_read_QTL_fdr_correction.py [-h] --input INPUT --output OUTPUT [--rejected | --no-rejected] [--drop_na | --no-drop_na] [--top_hit_per_gene | --no-top_hit_per_gene] [--top_hit_per_region | --no-top_hit_per_region]
-                                       [--unique_hits | --no-unique_hits]
+                                       [--top_by_property {p_value,r2}] [--unique_hits | --no-unique_hits]
 
 Perform multiple hypothesis testing false-discovery rate (FDR) correction for allele-specific methylation QTL output from all chromosomes.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --input INPUT         Path to input QTL file for all chromosomes; 'gene,window_size,outcome,predictor,beta,std_err,r2,p_value,N,predictor_freq' as header.
+  --input INPUT         Path to input QTL file for all chromosomes; 'gene,window_size,outcome,predictor,beta,std_err,r2,p_value,N,predictor_freq,intercept,overall_MAF,H1_MAF,H2_MAF,H1_missing_meth,H2_missing_meth' as header.
   --output OUTPUT       Path to the output QTL file with additional two fields - rejected and pvalue-corrected.
   --rejected, --no-rejected
                         Set this option to only print results where the null hypothesis was rejected (i.e., statistically significant associations). (default: False)
@@ -122,6 +122,8 @@ optional arguments:
                         Print only most significant hit per gene. (default: False)
   --top_hit_per_region, --no-top_hit_per_region
                         Print only most significant hit per methylation region. (default: False)
+  --top_by_property {p_value,r2}
+                        Choose top hit by this property (p value or R2 value).
   --unique_hits, --no-unique_hits
                         Print only unique set of included tests. (default: False)
 ```
