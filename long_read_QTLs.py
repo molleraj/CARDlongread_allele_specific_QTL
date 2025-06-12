@@ -131,6 +131,9 @@ def main():
                             'outcome': outcome,
                             'predictor': predictor,
                             'beta': model.params.get(predictor, np.nan),
+                            # add age coefficient
+                            # add sex_male (binary) coefficient
+                            # add PMI coefficient
                             'std_err': model.bse.get(predictor, np.nan),
                             'r2': model.rsquared,
                             'p_value': model.pvalues.get(predictor, np.nan),
