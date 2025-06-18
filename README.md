@@ -65,7 +65,8 @@ Input data for the QTL pipeline must be standardized in the formats listed in th
 ## Running the allele-specific QTL
 ```
 usage: long_read_QTLs.py [-h] --chromosome CHROMOSOME --roi_map ROI_MAP --genetic_data GENETIC_DATA --methylation_data METHYLATION_DATA --genetic_map GENETIC_MAP --methylation_map METHYLATION_MAP --metadata METADATA --output OUTPUT
-                         [--window_size WINDOW_SIZE] [--per_haplotype_missing_methylation_rate PER_HAPLOTYPE_MISSING_METHYLATION_RATE] [--per_haplotype_MAF PER_HAPLOTYPE_MAF] [--overall_MAF OVERALL_MAF]
+                         [--simulate_unphased | --no-simulate_unphased] [--window_size WINDOW_SIZE] [--per_haplotype_missing_methylation_rate PER_HAPLOTYPE_MISSING_METHYLATION_RATE] [--per_haplotype_MAF PER_HAPLOTYPE_MAF]
+                         [--overall_MAF OVERALL_MAF]
 
 Perform QTL analysis with user-specified parameters. Input data formats described in CARDlongread_data_standardization repository.
 
@@ -84,6 +85,8 @@ optional arguments:
                         Path to the methylation map file.
   --metadata METADATA   Path to the metadata file.
   --output OUTPUT       Output file destination for results.
+  --simulate_unphased, --no-simulate_unphased
+                        Convert phased genetics/methylation data to unphased where possible (i.e., exclude NAs) and run QTL on unphased data. (default: False)
   --window_size WINDOW_SIZE
                         Window size for defining gene regions (default: 500000).
   --per_haplotype_missing_methylation_rate PER_HAPLOTYPE_MISSING_METHYLATION_RATE
