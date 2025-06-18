@@ -40,6 +40,11 @@ def collapse_haps(genetic_data,methylation_data):
     for idx, i in enumerate(np.unique(methylation_data['SAMPLE'])):
         # set min_count to 2 to exclude NAs
         collapsed_haps_methylation_data.iloc[idx,1:]=methylation_data[methylation_data['SAMPLE']==i].drop(columns=['SAMPLE','HAPLOTYPE']).sum(min_count=2).values/2
+    # convert all columns to numeric with pd.to_numeric
+    for col in collapsed_haps_genetic_data.columns.drop('SAMPLE'):
+        collapsed_haps_genetic_data[col]=pd.to_numeric(collapsed_haps_genetic_data[col])
+    for col in collapsed_haps_methylation_data.columns.drop('SAMPLE'):
+        collapsed_haps_methylation_data[col]=pd.to_numeric(collapsed_haps_methylation_data[col])
     # return collapsed haps genetic and methylation data
     return(collapsed_haps_genetic_data,collapsed_haps_methylation_data)
 
@@ -126,10 +131,11 @@ def main():
                     # different procedure depending on whether or not unphased data simulated
                     
                     if (args.simulate_unphased is True):
+                        sample_outcome_predictor=merged_data[['SAMPLE',outcome,predictor]]
                         # reference frequency is proportion of 0 genotypes
-                        ref_variant_frequency=sum(haplotype_outcome_predictor[predictor]==0)/len(haplotype_outcome_predictor[predictor])
+                        ref_variant_frequency=sum(sample_outcome_predictor[predictor]==0)/len(sample_outcome_predictor[predictor])
                         # alternate frequency is proportion of 1 genotypes
-                        alt_variant_frequency=sum(haplotype_outcome_predictor[predictor]==1)/len(haplotype_outcome_predictor[predictor])
+                        alt_variant_frequency=sum(sample_outcome_predictor[predictor]==1)/len(sample_outcome_predictor[predictor])
                         # minor allele frequency is least of either reference or alternate frequencies
                         overall_minor_allele_frequency=min(ref_variant_frequency,alt_variant_frequency)
                         
