@@ -21,6 +21,8 @@ def parse_args():
     parser.add_argument("--methylation_data", required=True, help="Path to methylation data input file; format described in CARDlongread_data_standardization repository.")
     # set prefix for output files
     parser.add_argument("--output_prefix", required=True, help="Prefix for output files (plot and table per variant/phenotype combination).")
+    # analyze unphased input data
+    parser.add_argument("--unphased_input", action=argparse.BooleanOptionalAction, default=False, required=False, help="Visualize unphased QTL data outputs.")
     # compare phenotype for haplotype across all genotype haplotypes (trans comparison)
     parser.add_argument('--all_haps_comparison', action=argparse.BooleanOptionalAction, default=False, help="Compare all genetic against all methylation haplotypes (genetic H1/H2 against methylation H1/H2).")
     # add option for violinplot instead of boxplot
@@ -70,12 +72,18 @@ def main():
         current_phenotype=row[0]
         # define current variant based on current row (second column is variant)
         current_variant=row[1]
-        # subset genetic data on current variant of interest
-        genetic_data_subset_df=genetic_data_df[['SAMPLE','HAPLOTYPE',current_variant]]
-        # subset methylation data on current region of interest
-        methylation_data_subset_df=methylation_data_df[['SAMPLE','HAPLOTYPE',current_phenotype]]
+        if (args.unphased_input is True):
+            # subset genetic data on current variant of interest
+            genetic_data_subset_df=genetic_data_df[['SAMPLE',current_variant]]
+            # subset methylation data on current region of interest
+            methylation_data_subset_df=methylation_data_df[['SAMPLE',current_phenotype]]
+        else:
+            # subset genetic data on current variant of interest
+            genetic_data_subset_df=genetic_data_df[['SAMPLE','HAPLOTYPE',current_variant]]
+            # subset methylation data on current region of interest
+            methylation_data_subset_df=methylation_data_df[['SAMPLE','HAPLOTYPE',current_phenotype]]
         # cis or trans comparison depending on input setting
-        if args.all_haps_comparison is True:
+        if (args.all_haps_comparison is True) or (args.unphased_input is True):
             # merge genetic and methylation data on sample column alone
             merged_subset_df=pd.merge(genetic_data_subset_df,methylation_data_subset_df,on=['SAMPLE'])
         else:

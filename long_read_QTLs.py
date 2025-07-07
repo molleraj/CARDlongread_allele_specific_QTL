@@ -18,7 +18,8 @@ def parse_args():
     parser.add_argument("--methylation_map", required=True, help="Path to the methylation map file.")
     parser.add_argument("--metadata", required=True, help="Path to the metadata file.")
     parser.add_argument("--output", required=True, help="Output file destination for results.")
-    parser.add_argument("--simulate_unphased", action=argparse.BooleanOptionalAction, default=False, required=False, help="Convert phased genetics/methylation data to unphased where possible (i.e., exclude NAs) and run QTL on unphased data.")
+    parser.add_argument("--force_dephased", action=argparse.BooleanOptionalAction, default=False, required=False, help="Convert phased genetics/methylation data to dephased where possible (i.e., exclude NAs) and run QTL on dephased data.")
+    parser.add_argument("--unphased_input", action=argparse.BooleanOptionalAction, default=False, required=False, help="Run QTL on unphased genetics/methylation data inputs from data standardization pipeline.")
     parser.add_argument("--window_size", type=int, default=500000, help="Window size for defining gene regions (default: 500000).")
     # parser.add_argument("--minimum_genotypes",type=int, default=3, help="Minimum number of variant genotypes to run regression (default: 3).")
     parser.add_argument("--per_haplotype_missing_methylation_rate", default=0.95, help="Proportion of methylation calls missing per haplotype to consider for corresponding MAF exclusion (default: 0.95).")
@@ -68,8 +69,9 @@ def main():
     genetic_data = pd.read_csv(args.genetic_data, na_values="NA") #(dtype=genetic_data_types)
     # methylation data has floats so don't use data_types
     methylation_data = pd.read_csv(args.methylation_data, na_values="NA")
-    # collapse haps for genetic and methylation data if simulate_unphased set
-    (unphased_genetic_data,unphased_methylation_data)=collapse_haps(genetic_data,methylation_data)
+    # collapse haps for genetic and methylation data if force_dephased set
+    if args.force_dephased is True:
+        (dephased_genetic_data,dephased_methylation_data)=collapse_haps(genetic_data,methylation_data)
     
     # Subset ROI map by chromosome
     roi_map = roi_map[roi_map['CHROM'] == args.chromosome]
@@ -108,12 +110,15 @@ def main():
         # Merge all data - merge genetic data, methylation data, and metadata on SAMPLE and HAPLOTYPE columns (genetics + methylation)
         # This is based on the assumption that for each sample, genetics H1 and methylation H1 match
         # In future offer command line option to examine all haplotype combinations per sample, or trans haplotype combos
-        # merged data if phased
-        if (args.simulate_unphased is False):
-            merged_data = genetic_data.merge(methylation_data, on=['SAMPLE','HAPLOTYPE']).merge(metadata_reformed, on='SAMPLE')
         # merged data if unphased
+        if (args.unphased_input is True):
+            merged_data = genetic_data.merge(methylation_data, on=['SAMPLE']).merge(metadata_reformed, on='SAMPLE')
+        # merged data if dephased
+        elif (args.force_dephased is True):
+            merged_data = dephased_genetic_data.merge(dephased_methylation_data, on=['SAMPLE']).merge(metadata_reformed, on='SAMPLE')
+        # merged data if phased
         else:
-            merged_data = unphased_genetic_data.merge(unphased_methylation_data, on=['SAMPLE']).merge(metadata_reformed, on='SAMPLE')
+            merged_data = genetic_data.merge(methylation_data, on=['SAMPLE','HAPLOTYPE']).merge(metadata_reformed, on='SAMPLE')
         
         # Subset to relevant columns
         # I think TARGET is the name of the methylation region
@@ -130,7 +135,7 @@ def main():
                 try:
                     # different procedure depending on whether or not unphased data simulated
                     
-                    if (args.simulate_unphased is True):
+                    if ((args.force_dephased is True) or (args.unphased_input is True)):
                         sample_outcome_predictor=merged_data[['SAMPLE',outcome,predictor]]
                         # reference frequency is proportion of 0 genotypes
                         ref_variant_frequency=sum(sample_outcome_predictor[predictor]==0)/len(sample_outcome_predictor[predictor])

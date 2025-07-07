@@ -14,7 +14,7 @@ import os
 def parse_args():
     parser = argparse.ArgumentParser(description="Compare allele-specific QTL output to tensorQTL or additional allele-specific QTL output on common methylation region. Print common regions and those unique to each.")
     # argument for whether to compare against another allele specific QTL run or a tensor QTL run
-    parser.add_argument("--comparison_type",choices=["allele_specific_QTL", "tensor_QTL"],default="tensor_QTL",required=False,help="Comparison against tensorQTL hits or additional allele specific QTL run.")
+    parser.add_argument("--comparison_type",choices=["allele_specific_QTL_unphased", "allele_specific_QTL_phased","allele_specific_QTL_dephased","tensor_QTL"],default="tensor_QTL",required=False,help="Comparison against tensorQTL hits or additional allele-specific QTL run.")
     # argument for how to join allele specific QTL tables (e.g., for significant unique vs. all unique hits between runs)
     parser.add_argument("--allele_specific_join_on",choices=["region","variant","both"],default="region",required=False,help="Fields on which to join allele-specific QTL tables - methylation region (outcome), genetic variant (predictor), or both.")
     parser.add_argument("--tensor_QTL", required=False, help="Path to input tensorQTL tsv file for comparisons; 'phenotype_id	variant_id	af	pval_nominal	slope	slope_se	pval_perm	bh_fdr	qval	Chromosome	TOP SV ID	TOP SV Causal Post Probablity	TOP SNV ID	TOP SNV Causal Post Probablity' as header.")
@@ -70,7 +70,8 @@ def merge_tensor_allele_spec_tables(tensorQTL_df,allele_spec_QTL_df,include_regi
     merged_QTL_df['beta_signs_match']=(np.sign(merged_QTL_df['slope'])==np.sign(merged_QTL_df['beta']))
     # print number of concordant signs, discordant signs, and total samples
     print("Concordant beta signs: ",merged_QTL_df['beta_signs_match'].value_counts()[0])
-    print("Discordant beta signs: ",merged_QTL_df['beta_signs_match'].value_counts()[1])
+    if (len(merged_QTL_df['beta_signs_match'].value_counts()) > 1):
+        print("Discordant beta signs: ",merged_QTL_df['beta_signs_match'].value_counts()[1])
     print("Total common regions: ",len(merged_QTL_df))
     return(merged_QTL_df,tensor_QTL_only_df,allele_specific_QTL_only_df)
 
@@ -120,7 +121,8 @@ def merge_two_allele_spec_tables(allele_spec_QTL_df1,allele_spec_QTL_df2,include
     merged_QTL_df['beta_signs_match']=(np.sign(merged_QTL_df['beta_x'])==np.sign(merged_QTL_df['beta_y']))
     # print number of concordant signs, discordant signs, and total samples
     print("Concordant beta signs: ",merged_QTL_df['beta_signs_match'].value_counts()[0])
-    print("Discordant beta signs: ",merged_QTL_df['beta_signs_match'].value_counts()[1])
+    if (len(merged_QTL_df['beta_signs_match'].value_counts()) > 1):
+        print("Discordant beta signs: ",merged_QTL_df['beta_signs_match'].value_counts()[1])
     print("Total common regions: ",len(merged_QTL_df))
     return(merged_QTL_df,allele_specific_QTL1_only_df,allele_specific_QTL2_only_df)
     
@@ -141,11 +143,25 @@ def common_hits_visualizations(common_QTL_hits_df,comparison_type,output_prefix,
         common_QTL_hits_df_melted=common_QTL_hits_df.melt(value_vars=['Unphased', 'Phased'],
                     var_name='QTL type', 
                     value_name='Beta')
-    elif (comparison_type == "allele_specific_QTL"):
-        common_QTL_hits_df['Forced unphased']=common_QTL_hits_df['beta_x']
+    elif (comparison_type == "allele_specific_QTL_unphased"):
+        common_QTL_hits_df['Unphased']=common_QTL_hits_df['beta_x']
         common_QTL_hits_df['Phased']=common_QTL_hits_df['beta_y']
         # now melt on these variables
-        common_QTL_hits_df_melted=common_QTL_hits_df.melt(value_vars=['Forced unphased', 'Phased'],
+        common_QTL_hits_df_melted=common_QTL_hits_df.melt(value_vars=['Unphased', 'Phased'],
+                    var_name='QTL type', 
+                    value_name='Beta')
+    elif (comparison_type == "allele_specific_QTL_phased"):
+        common_QTL_hits_df['Phased run 1']=common_QTL_hits_df['beta_x']
+        common_QTL_hits_df['Phased run 2']=common_QTL_hits_df['beta_y']
+        # now melt on these variables
+        common_QTL_hits_df_melted=common_QTL_hits_df.melt(value_vars=['Phased run 1', 'Phased run 2'],
+                    var_name='QTL type', 
+                    value_name='Beta')
+    elif (comparison_type == "allele_specific_QTL_dephased"):
+        common_QTL_hits_df['Dephased']=common_QTL_hits_df['beta_x']
+        common_QTL_hits_df['Phased']=common_QTL_hits_df['beta_y']
+        # now melt on these variables
+        common_QTL_hits_df_melted=common_QTL_hits_df.melt(value_vars=['Dephased', 'Phased'],
                     var_name='QTL type', 
                     value_name='Beta')
     # then make grouped 
@@ -167,10 +183,18 @@ def common_hits_visualizations(common_QTL_hits_df,comparison_type,output_prefix,
         ax = sb.regplot(data=common_QTL_hits_df,x='slope',y='beta')
         # set axis labels
         ax.set(xlabel="Unphased beta",ylabel="Phased beta")
-    elif (comparison_type == "allele_specific_QTL"):
+    elif (comparison_type == "allele_specific_QTL_unphased"):
         ax = sb.regplot(data=common_QTL_hits_df,x='beta_x',y='beta_y')
         # set axis labels
-        ax.set(xlabel="Forced unphased beta",ylabel="Phased beta")
+        ax.set(xlabel="Unphased beta",ylabel="Phased beta")
+    elif (comparison_type == "allele_specific_QTL_phased"):
+        ax = sb.regplot(data=common_QTL_hits_df,x='beta_x',y='beta_y')
+        # set axis labels
+        ax.set(xlabel="Phased run 1 beta",ylabel="Phased run 2 beta")
+    elif (comparison_type == "allele_specific_QTL_dephased"):
+        ax = sb.regplot(data=common_QTL_hits_df,x='beta_x',y='beta_y')
+        # set axis labels
+        ax.set(xlabel="Dephased beta",ylabel="Phased beta")
     # set plot title if defined
     if plot_title is not None:
         ax.set(title=plot_title)
@@ -192,12 +216,14 @@ def main():
     # Load region filtering list
     if (args.include_regions is not None):
         regions_to_include_df=pd.read_csv(args.include_regions,sep="\t",header=None)
+    else:
+        regions_to_include_df=None
     # note that tensorQTL output is tab separated
     # only import if comparison type is "tensor_QTL"
     if (args.comparison_type == "tensor_QTL"):
         tensorQTL_df = pd.read_csv(args.tensor_QTL,sep="\t")
     if len(args.allele_specific_QTL) > 1:
-        # forced unphased
+        # forced unphased, unphased, or dephased
         allele_spec_QTL_df1 = pd.read_csv(args.allele_specific_QTL[0])
         # phased
         allele_spec_QTL_df2 = pd.read_csv(args.allele_specific_QTL[1])
@@ -212,12 +238,19 @@ def main():
         merged_QTL_df.to_csv(args.output_prefix + "_common.csv",index=False)
         tensor_QTL_only_df.to_csv(args.output_prefix + "_tensor_QTL_only.csv",index=False)
         allele_specific_QTL_only_df.to_csv(args.output_prefix + "_allele_specific_QTL_only.csv",index=False)
-    elif (args.comparison_type == "allele_specific_QTL"):
+        # print total tensor QTL hits
+        # print total allele specific phased QTL hits
+        # print common QTL hits and percentage phased QTL hits
+    else:
+    # elif (args.comparison_type == "allele_specific_QTL"):
         (merged_QTL_df,allele_specific_QTL1_only_df,allele_specific_QTL2_only_df)=merge_two_allele_spec_tables(allele_spec_QTL_df1,allele_spec_QTL_df2,regions_to_include_df,args.region_type,args.allele_specific_join_on)
         # output separate data frames
         merged_QTL_df.to_csv(args.output_prefix + "_common.csv",index=False)
         allele_specific_QTL1_only_df.to_csv(args.output_prefix + "_allele_specific_QTL1_only.csv",index=False)
         allele_specific_QTL2_only_df.to_csv(args.output_prefix + "_allele_specific_QTL2_only.csv",index=False)
+        # print total allele specific phased QTL run 1 hits
+        # print total allele specific phased QTL run 2 hits
+        # print common QTL hits and percentage phased QTL run 2 hits
     
     # make histogram and scatterplot of common hits' betas
     common_hits_visualizations(merged_QTL_df,args.comparison_type,args.output_prefix,args.plot_title)

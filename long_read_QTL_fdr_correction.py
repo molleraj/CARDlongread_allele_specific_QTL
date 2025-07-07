@@ -75,6 +75,10 @@ def main():
     # Load input file
     input_QTL_df = pd.read_csv(args.input)
     
+    # print total tests considered and file name
+    print("Input QTL file is ",args.input)
+    print("Total tests processed: ",len(input_QTL_df))
+    
     # drop na p values if drop_na selected
     # if na p values are kept, all corrected p-values are na
     if args.drop_na is True:
@@ -93,18 +97,22 @@ def main():
         # filter only for unique hits
         # may remove gene names (only keeps first of hit found multiple times)
         input_QTL_df=get_unique_QTL_hits(input_QTL_df)
+        print("Total unique tests: ", len(input_QTL_df))
     
     if args.rejected is True:
         # only print results where null hypothesis is rejected
         input_QTL_df=input_QTL_df[input_QTL_df['rejected']==True]
+        print("Total significant tests: ", len(input_QTL_df))
         
     if args.top_hit_per_region is True:
         # filter for only top hit for each gene
         input_QTL_df=get_top_hit_per_region(input_QTL_df,args.top_by_property)
+        print("Total significant regions: ",len(input_QTL_df))
     
     if args.top_hit_per_gene is True:
         # filter for only top hit for each gene
         input_QTL_df=get_top_hit_per_gene(input_QTL_df,args.top_by_property)
+        print("Total significant genes of interest: ",len(input_QTL_df))
     
     # save output file; no indexes
     input_QTL_df.to_csv(args.output,index=False)
