@@ -115,6 +115,7 @@ def main():
         print("Total significant genes of interest: ",len(input_QTL_df))
     
     # save output file; no indexes
+    print("Output QTL file is ",args.output)
     input_QTL_df.to_csv(args.output,index=False)
     
     # Print runtime and max RAM usage

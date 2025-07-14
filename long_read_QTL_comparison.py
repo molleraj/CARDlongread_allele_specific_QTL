@@ -165,7 +165,7 @@ def common_hits_visualizations(common_QTL_hits_df,comparison_type,output_prefix,
                     var_name='QTL type', 
                     value_name='Beta')
     # then make grouped 
-    sb.histplot(data=common_QTL_hits_df_melted,x='Beta',hue='QTL type',multiple="dodge")
+    sb.histplot(data=common_QTL_hits_df_melted,x='Beta',hue='QTL type',multiple="dodge",palette=pcolors)
     # set axis labels
     ax.set(xlabel="Beta",ylabel="Frequency")
     # set plot title if defined
