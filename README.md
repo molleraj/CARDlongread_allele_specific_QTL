@@ -1,11 +1,24 @@
-# NIA CARD Long Read Sequencing Allele-Specific Quantitative Trait Locus (QTL) Analysis Pipeline
-This is the repository for the allele-specifc QTL pipeline developed by the CARD long-read sequencing/applied neurogenomics group. We developed a pipeline to perform allele-specific quantitative trait locus (QTL) analysis on phased, harmonized genetic variant and methylation data initially generated for NABEC and HBCC cohorts. Existing QTL pipelines take unphased variant and phenotype data as input. We anticipated that an allele-specific analysis might capture haplotype-specific signals averaged out in unphased data, particularly for methylation. Future development will extend this pipeline to handle more types of omic phenotypic data.
+# NIA CARD Long Read Sequencing Allele-Specific Quantitative Trait Locus (QTL) Analysis Pipeline ASM-LR
+This is the repository for the allele-specifc QTL pipeline Allele-Specific Methylation - Long Read (ASM-LR) developed by the CARD long-read sequencing/applied neurogenomics group. We developed a pipeline to perform allele-specific quantitative trait locus (QTL) analysis on phased, harmonized genetic variant and methylation data initially generated for NABEC and HBCC cohorts. Existing QTL pipelines take unphased variant and phenotype data as input. We anticipated that an allele-specific analysis might capture haplotype-specific signals averaged out in unphased data, particularly for methylation. Future development will extend this pipeline to handle more types of omic phenotypic data.
 
 ## Pipeline overview
 ![image](https://github.com/user-attachments/assets/0bab07c8-ef38-438c-bb94-08bf5f0c4122)
 ## Dependencies
 ## Containerization
 ## Resource use considerations
+ASM-LR was developed and validated on the NIH Biowulf HPC cluster. The ASM-LR mQTL portion itself was run in slurm jobs, broken down by variants per chromosome. We allocated 16 CPUs and 32GB of RAM per mQTL job. In order to reduce resource use requirements, we suggest subsetting variants by chromosome as described in a later section of the readme. We have included examples of slurm job submission scripts specifying per chromosome resource requirements in this section. 
+
+Metadata preparation and postprocessing/data visualization steps, on the other hand, were run in interactive HPC nodes with 64GB of RAM and 64 CPUs allocated, but could also be run with fewer CPUs and less RAM. We have included maximum RAM use and run time reporting in each script to assist with further optimization of resource allocation. Below is an example from the ```long_read_QTL_fdr_correction.py``` false discovery rate (FDR) correction script to select significant tests.
+```
+Input QTL file is  /data/CARDPB/data/NABEC/projects/allele_spec_jon_gene_subset//NABEC/QTL/NABEC_QTL_SNV_SV_CGI_concat_061125.csv
+Total tests processed:  97561
+Total unique tests:  83697
+Total significant tests:  72
+Output QTL file is  /data/CARDPB/data/NABEC/projects/allele_spec_jon_gene_subset//NABEC/QTL/NABEC_QTL_SNV_SV_CGI_concat_fdr_rejected_dropna_unique_061125.csv
+Execution Time: 0.21 seconds
+Max RAM Usage: 125.92 MB
+```
+
 ## Metadata considerations
 As described in our [data standardization](https://github.com/NIH-CARD/CARDlongread_data_standardization) repository, we have prepared scripts to guide the exploratory data analysis (EDA) process, particularly calculation of PCs, evaluation of PC contribution through stepwise regression, and merging with covariates. We have written two scripts to perform principal component analysis on different types of data (e.g., genetic variants, methylation, gene expression) and then join chosen principal components with a standard sample metadata table. The first script (```make_pcs_stepwise.py```) runs PCA on different input data types and creates scree plots to assist choice of PCs that explain most of the variation in the data. It includes options for each data type and for the PC prefix (e.g., GENETIC_ and thus GENETIC_PC for PCs from genetic variant data). The second script (```choose_pcs_join_metadata.py```) takes a list of input PC files from the first script and a list of values that indicate the number of PCs to include (starting from PC_1) from each PC file. It then generates a metadata/covariates/PCs table joined on common samples ("SAMPLE" column) and a correlation matrix plus corresponding heatmap to identify relationships between included covariates.
 
