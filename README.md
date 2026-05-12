@@ -112,6 +112,7 @@ optional arguments:
   --overall_MAF OVERALL_MAF
                         Minimum minor allele frequency for both haplotypes to run regression (default: 0.05).
 ```
+The allele-specific QTL results include the following fields (columns) in the default output:
 ## Parallelizing QTL by chromosome
 ## Postprocessing and data visualization
 ```
@@ -146,6 +147,7 @@ optional arguments:
   --unique_hits, --no-unique_hits
                         Print only unique set of included tests. (default: False)
 ```
+QTL output processed through the above FDR correction script adds the following additional fields:
 ```
 usage: long_read_QTL_data_visualization.py [-h] --input_combinations INPUT_COMBINATIONS --genetic_data GENETIC_DATA --methylation_data METHYLATION_DATA --output_prefix OUTPUT_PREFIX [--all_haps_comparison | --no-all_haps_comparison]
                                            [--violin_plot | --no-violin_plot] [--strip_plot | --no-strip_plot]
